@@ -1,0 +1,303 @@
+<html>
+
+<link rel="stylesheet" type="text/css" href="../../lib/css/themes/jquery-ui/redmond/jquery-ui.min.css"/>
+<link rel="stylesheet" type="text/css" href="../../lib/css/jqGrid/ui.jqgrid-4.5.4.css"/>
+<link rel="stylesheet" type="text/css" href="../../lib/css/jquery.multiselect-1.13.css"/>
+<script type="text/javascript" src="../../lib/js/jquery-1.11.1.min.js"></script>
+<script type="text/javascript" src="../../socket.io/socket.io.js"></script>
+<script type="text/javascript" src="../../lib/js/jquery-ui-1.10.3.full.min.js"></script>
+<script type="text/javascript" src="../../lib/js/jqGrid/jquery.jqGrid-4.5.4.min.js"></script>
+<script type="text/javascript" src="../../lib/js/jqGrid/grid.locale-all.js"></script>
+
+<link rel="stylesheet" type="text/css" href="../../css/adapter.css"/>
+<script type="text/javascript" src="../../js/translate.js"></script>
+<script type="text/javascript" src="../../js/adapter-settings.js"></script>
+
+<style>
+    .oneWidth {
+        width: 120px;
+    }
+
+</style>
+<script type="text/javascript">
+    // Dictionary (systemDictionary is global variable from adapter-settings.js)
+    systemDictionary = {
+        "mysensors adapter settings": {"ru": "Настройки"},
+        "Select port":          {"en": "Select port",   "de": "Select port",            "ru": "COM порт"},
+        "Bind":                 {"en": "Bind",          "de": "Bind",                   "ru": "IP сервера:"},
+        "mySensors adapter settings": {
+            "en": "mySensors adapter settings",
+            "de": "mySensors Einstellungen",
+            "ru": "Настройки mySensors драйвера"
+        },
+        "Type:":                {"en": "Type:",             "de": "Typ:",               "ru": "Тип:"},
+        "serial":               {"en": "serial",            "de": "serial",             "ru": "COM порт"},
+        "tcp server":           {"en": "TCP server",        "de": "TCP Server",         "ru": "TCP сервер"},
+        "udp server":           {"en": "UDP server",        "de": "UDP Server",         "ru": "UDP сервер"},
+        "Not available":        {"en": "Not available",     "de": "Nicht möglich",      "ru": "недоступно"},
+        "Listen on all IPs":    {"en": "Listen on all IPs", "de": "Auf allen IP Adressen hören",  "ru": "Слушать на всех IP адресах"},
+        "Com port:":            {"en": "Com port:",         "de": "Serialport:",        "ru": "Имя порта:"},
+        "Baud rate:":           {"en": "Baud rate:",        "de": "Baudrate:",          "ru": "Скорость порта:"},
+        "Bind:":                {"en": "Bind:",             "de": "Eigene IP Adresse:", "ru": "Свой IP aдрес:"},
+        "Port:":                {"en": "Port:",             "de": "Port:",              "ru": "Порт:"},
+        "Connection timeout:":  {"en": "Connection timeout:", "de": "Verbindungs-Timeout:", "ru": "Таймаут соединения:"},
+        "ms":                   {"en": "ms",                "de": "ms",                 "ru": "мс"},
+        "Inclusion mode timeout:": {"en": "Inclusion mode timeout:", "de": "Anlernen-Timeout:", "ru": "Время для присваивания адресов:"},
+        "Enable inclusion mode": {"en": "Enable inclusion mode", "de": "Enable Anlernen-Modus", "ru": "Включить режим присваивания адресов"},
+        "Inclusion mode is active": {"en": "Inclusion mode is active", "de": "Anlernen-Modus ist aktiv", "ru": "Режим присваивания адресов активирован"},
+        "Ok":                   {"en": "Ok",                "de": "Ok",                 "ru": "Ok"},
+    };
+    var devices;
+    var units;
+    //   getIPs(function(ips) {
+    //         for (var i = 0; i < ips.length; i++) {
+    //             $('#bind').append('<option value="' + ips[i].address + '">' + ips[i].name + '</option>');
+    //         }
+    //       //  $('#bind.value').val(settings.bind);
+    //     });
+
+    function addUnit(node) {
+        try {
+            node.name = node.subType + '_' + node.id + '_' + node.childId;
+            node.room = '';
+            var devices = getTableResult('devices', ['name', 'id', 'childId', 'subType', 'room']);
+            for (var i = 0; i < devices.length; i++) {
+                if (devices[i].id      == node.id      &&
+                    devices[i].childId == node.childId &&
+                    devices[i].subType == node.subType) {
+                    showMessage(_('Device yet exists in the table'));
+                    return;
+                }
+            }
+            if (node.type) delete node.type;
+            if (node.payload) delete node.payload;
+            if (node.raw)   delete node.raw;
+
+            addToTable('devices', node);
+        } catch (e) {
+
+        }
+    }
+
+    function getUnit() {
+        $('#getUnit').prop('disabled', true);
+        sendTo(null, 'listUnits', null, function (units) {
+            $('#getUnit').prop('disabled', false);
+
+            var text = '<tr bgcolor="#808080"><td>' + _('id') +
+                    '</td><td>' + _('childId') +
+                    '</td><td>' + _('type') +
+                    '</td><td>' + _('ack') +
+                    '</td><td>' + _('subType') +
+                    '</td><td>' + _('payload') +
+                    '</td><td>' + _('Bind') +
+                    '</td></tr>';
+
+             for (var j = 0; j < units.length; j++) {
+                text += '<tr><td>'  + units[j].id +
+                        '</td><td>' + units[j].childId +
+                        '</td><td>' + (units[j].type  || '') +
+                        '</td><td>' + units[j].ack +
+                        '</td><td>' + (units[j].subType || '') +
+                        '</td><td>' + (units[j].payload || '') +
+                        '</td><td><button onclick=\'addUnit(' + JSON.stringify(units[j]) + ');\'>' + _('bind') + '</button>' +
+                        '</td></tr>';
+            }
+
+            $('#comTbl').html(text);
+        });
+    }
+
+    var timeout;
+
+    function getComPorts(actualValue) {
+        timeout = setTimeout(function () {
+            getComPorts(actualValue);
+        }, 2000);
+
+        sendTo(null, 'listUart', null, function (list) {
+            if (timeout) {
+                clearTimeout(timeout);
+                timeout = null;
+            }
+            if (!list || !list.length) {
+                setTimeout(function () {
+                    getComPorts(actualValue);
+                }, 1000);
+                return;
+            }
+            var text = '<option value="">' + _('Select port') + '</option>';
+            for (var j = 0; j < list.length; j++) {
+                if (list[j].comName === 'Not available') {
+                    text += '<option value="" selected>' + _('Not available') + '</option>';
+                    $('#comName').prop('disabled', true);
+                    break;
+                } else {
+                    text += '<option value="' + list[j].comName + '" ' + ((actualValue == list[j].comName) ? 'selected' : '') + '>' + list[j].comName + '</option>';
+                }
+            }
+            $('#comName').html(text);
+        });
+    }
+
+    function setValue(id, value, onChange) {
+        // example: select elements with id=key and class=value and insert value
+        if ($('#' + id + '.value').attr('type') == 'checkbox') {
+            $('#' + id + '.value').prop('checked', value).change(function () {
+                onChange();
+            });
+        } else {
+            $('#' + id + '.value').val(value).change(function () {
+                onChange();
+            }).keyup(function () {
+                // Check that only numbers entered
+                if ($(this).hasClass('number')) {
+                    var val = $(this).val();
+                    if (val) {
+                        var newVal = '';
+                        for (var i = 0; i < val.length; i++) {
+                            if (val[i] >= '0' && val[i] <= '9') {
+                                newVal += val[i];
+                            }
+                        }
+                        if (val != newVal) $(this).val(newVal);
+                    }
+                }
+                onChange();
+            });
+        }
+    }
+
+    // the function loadSettings has to exist ...
+    function load(settings, onChange) {
+        if (!settings) return;
+        devices = settings.devices || [];
+        for (var key in settings) {
+            setValue(key, settings[key], onChange);
+        }
+        $('#enableInclusion').button().button('disable');
+
+        setInterval(function () {
+            socket.emit('getState', adapter + '.' + instance + '.inclusionOn', function (err, state) {
+                if (state && !state.val) {
+                    $('#enableInclusion').button('enable');
+                } else {
+                    $('#enableInclusion').button('disable');
+                }
+            });
+        }, 5000);
+
+        socket.emit('getState', adapter + '.' + instance + '.inclusionOn', function (err, state) {
+            if (err) window.alert(err);
+            if (state && !state.val) {
+                $('#enableInclusion').button('enable').click(function () {
+                    socket.emit('setState', adapter + '.' + instance + '.inclusionOn', {val: true, ack: false}, function (err) {
+                        if (!err) {
+                            $('#enableInclusion').button('disable');
+                            showMessage(_('Inclusion mode is active'));
+                        } else {
+                            showError(err);
+                        }
+                    });
+                });
+            }
+        });
+
+        getIsAdapterAlive(function (isAlive) {
+            if (isAlive || common.enabled) {
+                getComPorts(settings.comName);
+            } else {
+                $('#getUnit').prop('disabled', true);
+                $('#enableInclusion').button('disable');
+            }
+        });
+
+        getIPs(function (ips) {
+            for (var i = 0; i < ips.length; i++) {
+                $('#bind').append('<option value="' + ips[i].address + '">' + ips[i].name + '</option>');
+            }
+            $('#bind.value').val(settings.bind);
+        });
+
+        //editTable('devices', ['name', 'id', 'childId', 'subType', 'room'], devices, 350);
+        $('#type').change(onTypeChange);
+        onTypeChange();
+        onChange(false);
+    }
+
+    function onTypeChange() {
+        $('.serial').hide();
+        $('.tcp').hide();
+        $('.udp').hide();
+        $('.' + $('#type').val()).show();
+    }
+    
+    // ... and the function save has to exist.
+    // you have to make sure the callback is called with the settings object as first param!
+    function save(callback) {
+        var obj = {};
+        $('.value').each(function () {
+            var $this = $(this);
+            if ($this.attr('type') == 'checkbox') {
+                obj[$this.attr('id')] = $this.prop('checked');
+            } else if ($this.attr('type') == 'number') {
+                obj[$this.attr('id')] = parseInt($this.val());
+            } else {
+                obj[$this.attr('id')] = $this.val();
+            }
+        });
+        // Get edited table  name;node_id;child-sensor-id;message-type;ack;sub_type;payload\n
+        //obj.devices = getTableResult('devices', ['name', 'id', 'childId', 'subType', 'room']);
+        callback(obj);
+    }
+</script>
+<style type="text/css">
+    .tab1 {
+        border:     1px solid blue;
+        width:      95%;
+        overflow:   auto;
+    }
+    .help {
+        font-size: small;
+    }
+</style>
+<!-- you have to put your config page in a div with id adapter-container<button id="addunit" onclick="test()">bind</button> -->
+    <div id="adapter-container">
+        <table><tr><td><img src="mysensors.png"></td><td><h3 class="translate">mySensors adapter settings</h3></td></tr></table>
+        <table>
+            <tr><td class="translate" style="width: 150px">Type:</td><td><select id="type" class="value oneWidth">
+                <option value="serial"  class="translate">serial</option>
+                <option value="tcp"     class="translate">tcp server</option>
+                <option value="udp"     class="translate">udp server</option>
+            </select></td><td></td></tr>
+            <tr class="serial"><td class="translate">Com port:</td><td><select class="value oneWidth" id="comName"></select></td><td></td></tr>
+            <tr class="serial"><td class="translate">Baud rate:</td><td><select class="value oneWidth" id="baudRate">
+                <option value="110">110</option>
+                <option value="150">150</option>
+                <option value="300">300</option>
+                <option value="600">600</option>
+                <option value="1200">1200</option>
+                <option value="2400">2400</option>
+                <option value="4800">4800</option>
+                <option value="9600">9600</option>
+                <option value="19200">19200</option>
+                <option value="38400">38400</option>
+                <option value="56000">56000</option>
+                <option value="57600">57600</option>
+                <option value="115200">115200</option>
+            </select></td><td></td></tr>
+            <tr class="tcp udp"><td class="translate">Bind:</td><td><select class="value" id="bind"></select></td><td></td></tr>
+            <tr class="tcp udp"><td class="translate">Port:</td><td><input class="value oneWidth" id="port" /></td><td></td></tr>
+            <tr class="udp serial"><td class="translate">Connection timeout:</td><td><input type="number" class="value oneWidth" id="connTimeout" /></td><td class="translate">ms</td></tr>
+            <tr class="tcp udp serial"><td class="translate">Inclusion mode timeout:</td><td><input type="number" class="value oneWidth" id="inclusionTimeout" /></td><td><span class="translate">ms</span></td></tr>
+            <tr class="tcp udp serial"><td></td><td colspan="2"><button id="enableInclusion" class="translateB">Enable inclusion mode</button></td></tr>
+        </table>
+
+
+
+        <!--table class="tab1" id="comTbl" border="1" cellspacing="0"></table>
+    <div   id="pager-devices"></div>
+    <table id="devices"></table-->
+    </div>
+
+</html>

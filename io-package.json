@@ -1,0 +1,182 @@
+{
+  "common": {
+    "name": "mysensors-2",
+    "version": "2.0.0",
+    "news": {
+      "1.0.1": {
+        "en": "necessary version of sensor module increased",
+        "de": "necessary version of sensor module increased",
+        "ru": "necessary version of sensor module increased"
+      },
+      "1.0.0": {
+        "en": "some value corrections and enlargement",
+        "de": "some value corrections and enlargement",
+        "ru": "some value corrections and enlargement"
+      },
+      "0.2.6": {
+        "en": "do not switch off inclusion mode by stop",
+        "de": "do not switch off inclusion mode by stop",
+        "ru": "do not switch off inclusion mode by stop"
+      },
+      "0.2.5": {
+        "en": "remove debug outputs",
+        "de": "remove debug outputs",
+        "ru": "remove debug outputs"
+      },
+      "0.2.4": {
+        "en": "try/catch parse of messages",
+        "de": "try/catch parse of messages",
+        "ru": "try/catch parse of messages"
+      }
+    },
+    "title": "mysensors-2 adapter",
+    "desc": {
+      "en": "ioBroker mysensors-2 Adapter",
+      "de": "ioBroker Mysensors-2 Adapter",
+      "ru": "ioBroker Mysensors-2 драйвер "
+    },
+    "platform":   "Javascript/Node.js",
+    "mode":       "daemon",
+    "icon":       "mysensors.png",
+    "enabled":    false,
+    "messagebox": true,
+    "extIcon":    "https://raw.githubusercontent.com/ioBroker/ioBroker.mysensors/master/admin//mysensors.png",
+    "keywords": [
+      "mysensors",
+      "arduino"
+    ],
+    "readme":     "https://github.com/ioBroker/ioBroker.mysensors/blob/master/README.md",
+    "loglevel":   "info",
+    "stopBeforeUpdate": true,
+    "type":       "hardware"
+  },
+  "native": {
+    "comName":      "",
+    "connTimeout":  60000,
+    "port":         5003,
+    "baudRate":     115200,
+    "mode":         "server",
+    "type":         "udp",
+    "bind":         "0.0.0.0",
+    "broadcast":    false,
+    "inclusionTimeout": 60000
+  },
+  "objects": [
+  ],
+  "instanceObjects": [
+    {
+      "_id":  "info",
+      "type": "channel",
+      "common": {
+        "name": "Information"
+      },
+      "native": {}
+    },
+    {
+      "_id":  "commands",
+      "type": "channel",
+      "common": {
+        "name": "Commands"
+      },
+      "native": {}
+    },
+    {
+      "_id":  "info.connection",
+      "type": "state",
+      "common": {
+        "role":  "indicator.connected",
+        "name":  "If connected to my sensors",
+        "type":  "boolean",
+        "read":  true,
+        "write": false,
+        "def":   false
+      },
+      "native": {}
+    },
+    {
+      "_id":  "commands.inclusionOn",
+      "type": "state",
+      "common": {
+        "role":  "state",
+        "name":  "Inclusion mode activated",
+        "desc":  "If inclusion mode on or off",
+        "type":  "boolean",
+        "read":  true,
+        "write": true,
+        "def":   true
+      },
+      "native": {}
+    },
+    {
+      "_id":  "commands.sendRaw",
+      "type": "state",
+      "common": {
+        "role":  "state",
+        "name":  "Send a raw command",
+        "desc":  "e.g. 255;0;3;0;19;0 for request presentatio",
+        "type":  "string",
+        "read":  true,
+        "write": true,
+        "def":   ""
+      },
+      "native": {}
+    },
+    {
+      "_id":  "commands.requestPresentation",
+      "type": "state",
+      "common": {
+        "role":  "state",
+        "name":  "Send a presentation request",
+        "desc":  "Send a presentation request",
+        "type":  "string",
+        "read":  true,
+        "write": true,
+        "def":   ""
+      },
+      "native": {}
+    },
+    {
+      "_id":  "commands.requestHeartbeat",
+      "type": "state",
+      "common": {
+        "role":  "state",
+        "name":  "Send a heartbeat request",
+        "desc":  "Send a heartbeat request",
+        "type":  "string",
+        "read":  true,
+        "write": true,
+        "def":   ""
+      },
+      "native": {}
+    },
+    {
+      "_id":  "commands.requestClearEEPromAndReeboot",
+      "type": "state",
+      "common": {
+        "role":  "state",
+        "name":  "Send a clear EEPROM and reboot",
+        "desc":  "Send a clear EEPROM and reboot",
+        "type":  "string",
+        "read":  true,
+        "write": true,
+        "def":   ""
+      },
+      "native": {}
+    },
+    {
+      "_id":  "commands.requestReboot",
+      "type": "state",
+      "common": {
+        "role":  "state",
+        "name":  "Send a reboot request",
+        "desc":  "Send a reboot request",
+        "type":  "string",
+        "read":  true,
+        "write": true,
+        "def":   ""
+      },
+      "native": {}
+    }
+  ]
+}
+
