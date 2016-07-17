@@ -40,12 +40,12 @@
     "icon":       "mysensors.png",
     "enabled":    false,
     "messagebox": true,
-    "extIcon":    "https://raw.githubusercontent.com/ioBroker/ioBroker.mysensors/master/admin//mysensors.png",
+    "extIcon":    "https://raw.githubusercontent.com/soef/ioBroker.mysensors-2/master/admin//mysensors.png",
     "keywords": [
       "mysensors",
       "arduino"
     ],
-    "readme":     "https://github.com/ioBroker/ioBroker.mysensors/blob/master/README.md",
+    "readme":     "https://github.com/soef/ioBroker.mysensors-2/blob/master/README.md",
     "loglevel":   "info",
     "stopBeforeUpdate": true,
     "type":       "hardware"

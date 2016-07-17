@@ -2,7 +2,7 @@
 
 var utils      = require(__dirname + '/lib/utils'); // Get common adapter utils
 var MySensors  = require(__dirname + '/lib/mysensors');
-var sensorEnums = require(__dirname + '/lib/mysensors-enums');
+var sensorEnums = require(__dirname + '/lib/mySensors-enums');
 var meta = require(__dirname + '/lib/getmeta').meta;
 
 var STATE_INCLUSION_ON    = 'commands.inclusionOn',
