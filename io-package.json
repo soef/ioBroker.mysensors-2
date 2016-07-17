@@ -1,7 +1,7 @@
 {
   "common": {
     "name": "mysensors-2",
-    "version": "2.0.1",
+    "version": "2.0.2",
     "news": {
       "1.0.1": {
         "en": "necessary version of sensor module increased",
@@ -40,7 +40,7 @@
     "icon":       "mysensors.png",
     "enabled":    false,
     "messagebox": true,
-    "extIcon":    "https://raw.githubusercontent.com/soef/ioBroker.mysensors-2/master/admin//mysensors.png",
+    "extIcon":    "https://raw.githubusercontent.com/soef/ioBroker.mysensors-2/master/admin/mysensors.png",
     "keywords": [
       "mysensors",
       "arduino"
@@ -56,7 +56,7 @@
     "port":         5003,
     "baudRate":     115200,
     "mode":         "server",
-    "type":         "udp",
+    "type":         "",
     "bind":         "0.0.0.0",
     "broadcast":    false,
     "inclusionTimeout": 60000

@@ -1,6 +1,6 @@
 {
   "name": "iobroker.mysensors-2",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "description": "ioBroker mysensors-2 Adapter",
   "author": {
     "name": "soef",

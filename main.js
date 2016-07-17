@@ -710,15 +710,10 @@ function readExistingObjects (cb) {
 }
 
 
-function heartbeat() {
-    if (adapter.config.connTimeout) {
-
-    }
-}
-
 var connectTries = 0;
 
 function run() {
+    if (adapter.config.type == '') return;
     mySensorsInterface = null;
     mySensorsInterface = new MySensors(adapter.config, adapter.log, function (error) {
         if (error) {
@@ -762,8 +757,8 @@ function run() {
 
 function main() {
 
-    adapter.config.connTimeout = parseInt(adapter.config.connTimeout);
-    adapter.config.inclusionTimeout = parseInt(adapter.config.inclusionTimeout);
+    //adapter.config.connTimeout = parseInt(adapter.config.connTimeout);
+    //adapter.config.inclusionTimeout = parseInt(adapter.config.inclusionTimeout);
     checkInstanceObjects(false, function() {
         adapter.getState(STATE_INCLUSION_ON, function (err, state) {
             if (state == null) {
