@@ -1,7 +1,7 @@
 {
   "common": {
     "name": "mysensors-2",
-    "version": "2.0.2",
+    "version": "2.0.5",
     "news": {
       "1.0.1": {
         "en": "necessary version of sensor module increased",
@@ -38,7 +38,7 @@
     "platform":   "Javascript/Node.js",
     "mode":       "daemon",
     "icon":       "mysensors.png",
-    "enabled":    false,
+    "enabled":    true,
     "messagebox": true,
     "extIcon":    "https://raw.githubusercontent.com/soef/ioBroker.mysensors-2/master/admin/mysensors.png",
     "keywords": [

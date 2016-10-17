@@ -96,6 +96,7 @@ function onStateChange(id, state) {
     var commandIdx = id.indexOf('.commands.');
     if (commandIdx > 0) {
         var cmd = id.substr(commandIdx+10);
+        if(cmd=='sendRaw') cmd = 'rawCommand';
         if (commands[cmd] != undefined) {
             if (commandIdx == adapter.namespace.length) {
                 commands[cmd] (state.val);
@@ -288,7 +289,9 @@ function saveResult(_id, result, ip, force) {
         doIt(_id);
         return;
     }
-    if (force) createStateFromPacket(ip, result, doIt);
+    if (checkInclusion(result)) {
+        if (force) createStateFromPacket(ip, result, doIt);
+    }
 }
 
 
@@ -423,7 +426,8 @@ var sprintf = require("sprintf-js").sprintf;
 
 function onDataPacket (res, client) {
 
-    if (adapter.ioPack.common.loglevel == 'info' || adapter.ioPack.common.loglevel == 'debug') {
+    if ((adapter.ioPack.common.loglevel == 'info' || adapter.ioPack.common.loglevel == 'debug') &&
+        (res.num.type != C_INTERNAL && res.num.subType != I_HEARTBEAT_RESPONSE)) {
         adapter.log.info(
             sprintf('Got from %s: %3s; %3s; %-17s %s; %-28s %s',
                 (client.ip ? client.ip : ''),
@@ -753,6 +757,11 @@ function run() {
         mySensorsInterface.write('0;0;3;0;14;Gateway startup complete');
     });
 }
+
+
+//adapter.on('install', function () {
+//    adapter.createDevice('root', {});
+//});
 
 
 function main() {
