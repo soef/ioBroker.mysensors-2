@@ -69,7 +69,7 @@ var adapter = utils.adapter({
                     if (serialport) {
                         // read all found serial ports
                         serialport.list(function (err, ports) {
-                            adapter.log.info('List of port: ' + JSON.stringify(ports));
+                            adapter.log.debug('List of ports: ' + JSON.stringify(ports));
                             adapter.sendTo(obj.from, obj.command, ports, obj.callback);
                         });
                     } else {
@@ -426,9 +426,9 @@ var sprintf = require("sprintf-js").sprintf;
 
 function onDataPacket (res, client) {
 
-    if ((adapter.ioPack.common.loglevel == 'info' || adapter.ioPack.common.loglevel == 'debug') &&
+    if ((/*adapter.ioPack.common.loglevel == 'info' ||*/ adapter.ioPack.common.loglevel == 'debug') &&
         (res.num.type != C_INTERNAL && res.num.subType != I_HEARTBEAT_RESPONSE)) {
-        adapter.log.info(
+        adapter.log.debud(
             sprintf('Got from %s: %3s; %3s; %-17s %s; %-28s %s',
                 (client.ip ? client.ip : ''),
                 res.id,
@@ -561,7 +561,7 @@ function onDataPacket (res, client) {
 
                 case I_CONFIG:
                     res.payload = (res.payload == 'I') ? 'Imperial' : 'Metric';
-                    adapter.log.info(res.subType + (client.ip ? ' from ' + client.ip : '') + ': ' + res.payload);
+                    adapter.log.debug(res.subType + (client.ip ? ' from ' + client.ip : '') + ': ' + res.payload);
                     config[client.ip || 'serial'] = config[client.ip || 'serial'] || {};
                     config[client.ip || 'serial'].metric = res.payload;
                     //mysSend(NODE_SENSOR_ID/*res.id*/, res.childId, C_INTERNAL, ACK_FALSE, I_CONFIG, 'M', ip);
@@ -569,7 +569,7 @@ function onDataPacket (res, client) {
                     break;
 
                 case I_LOG_MESSAGE:
-                    adapter.log.info('I_LOG_MESSAGE' + (client.ip ? ' from ' + client.ip : '') + ': ' + res.payload);
+                    adapter.log.debug('I_LOG_MESSAGE' + (client.ip ? ' from ' + client.ip : '') + ': ' + res.payload);
                     break;
 
                 case I_ID_REQUEST:
