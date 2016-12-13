@@ -13,7 +13,6 @@ var devices   = {};
 var mySensorsInterface;
 var inclusionOn = true;
 var inclusionTimeoutTimer = null;
-//var presentationDone = false;
 var gatewayReady = false;
 var config = {};
 
@@ -67,7 +66,6 @@ var adapter = utils.adapter({
             case 'listUart':
                 if (obj.callback) {
                     if (serialport) {
-                        // read all found serial ports
                         serialport.list(function (err, ports) {
                             adapter.log.debug('List of ports: ' + JSON.stringify(ports));
                             adapter.sendTo(obj.from, obj.command, ports, obj.callback);
@@ -79,19 +77,19 @@ var adapter = utils.adapter({
                 }
                 break;
         }
-    },
-
-    discover: function (callback) {
-    },
-
-    uninstall: function (callback) {
     }
+
+    // discover: function (callback) {
+    // },
+    //
+    // uninstall: function (callback) {
+    // }
 });
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 function onStateChange(id, state) {
-    adapter.log.debug('stateChange ' + id + ' ' + JSON.stringify(state));
+    //adapter.log.debug('stateChange ' + id + ' ' + JSON.stringify(state));
 
     var commandIdx = id.indexOf('.commands.');
     if (commandIdx > 0) {
@@ -428,7 +426,7 @@ function onDataPacket (res, client) {
 
     if ((/*adapter.ioPack.common.loglevel == 'info' ||*/ adapter.ioPack.common.loglevel == 'debug') &&
         (res.num.type != C_INTERNAL && res.num.subType != I_HEARTBEAT_RESPONSE)) {
-        adapter.log.debud(
+        adapter.log.debug(
             sprintf('Got from %s: %3s; %3s; %-17s %s; %-28s %s',
                 (client.ip ? client.ip : ''),
                 res.id,
@@ -439,7 +437,6 @@ function onDataPacket (res, client) {
                 res.payload
             ));
     }
-    //adapter.log.info('Got from ' + (ip?ip:'') + ': ' + ('  '+res.id).slice(-3) + '; ' + ('  '+res.childId).slice(-3) + '; ' + ((res.type+';            ').substr(0, 18)) + (res.ack ? 'ACK_TRUE ' : 'ACK_FALSE') + '; ' + ((res.subType+';                     ').substr(0,27)) + res.payload);
 
     //var __id = fullIdFromPacket(ip, res);
     var id = findDevice(res, client.ip);
@@ -553,7 +550,7 @@ function onDataPacket (res, client) {
                     break;
 
                 case I_INCLUSION_MODE:
-                    adapter.log.info('inclusion mode ' + (client.ip ? ' from ' + client.ip + ' ' : '') + ':' + res.payload ? 'STARTED' : 'STOPPED');
+                    adapter.log.debug('inclusion mode ' + (client.ip ? ' from ' + client.ip + ' ' : '') + ':' + res.payload ? 'STARTED' : 'STOPPED');
                     if (inclusionOn != res.payload && (res.payload)) {
                         commands.inclusionOn(res.payload);
                     }
@@ -719,7 +716,8 @@ var connectTries = 0;
 function run() {
     if (adapter.config.type == '') return;
     mySensorsInterface = null;
-    mySensorsInterface = new MySensors(adapter.config, adapter.log, function (error) {
+    //mySensorsInterface = new MySensors(adapter.config, adapter.log, function (error) {
+    mySensorsInterface = new MySensors(adapter, function (error) {
         if (error) {
             if (connectTries++ < 1 ) adapter.log.error('Failed to open serial port: ' + error);
             setTimeout(run, 5000);
@@ -727,9 +725,6 @@ function run() {
         }
         connectTries = 0;
         mySensorsInterface.onData = onData;
-        //mySensorsInterface.on('data', onData); ////xxx
-
-        //mySensorsInterface.on('connectionChange', function (client, ip, port) {
         mySensorsInterface.onConnectionChange = function(client) {
             adapter.setState(STATE_INFO_CONNECTION, client.connected, true);
             if (client.connected) {
@@ -743,12 +738,6 @@ function run() {
                     }, 1500);
                 }
             } else {
-                //commands.requestHeartbeat(GATEWAY_ADDRESS, client.ip);
-                //setTimeout(function() {
-                //    if(!mySensorsInterface.isConnected(client.ip)) {
-                //        setTimeout(run, 500);
-                //    }
-                //}, 2000);
                 if(adapter.config.type == 'serial') {
                     setTimeout(run, 500);
                 }
@@ -757,11 +746,6 @@ function run() {
         mySensorsInterface.write('0;0;3;0;14;Gateway startup complete');
     });
 }
-
-
-//adapter.on('install', function () {
-//    adapter.createDevice('root', {});
-//});
 
 
 function main() {
