@@ -6,6 +6,7 @@
     "name": "soef",
     "email": "soef@gmx.net.com"
   },
+  "main": "main.js",
   "contributors": [
     {
       "name": "soef",
