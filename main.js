@@ -254,6 +254,7 @@ function createStateFromPacket(ip, res, cb, id) {
     };
     var parentId = id.substr(0, id.lastIndexOf('.'));
     obj.common.name = (devices[parentId] && devices[parentId].common.name) ? devices[parentId].common.name + '.' + res.subType : res.subType;
+    //obj.common.name = (devices[parentId] && devices[parentId].common.name) ? devices[parentId].common.name /*+ '.' + res.subType*/ : res.subType;
     devices[id] = obj;
     adapter.log.info('Add new object: ' + id);
     adapter.setObject(id, obj, function (err) {
