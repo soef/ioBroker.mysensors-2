@@ -15,7 +15,7 @@
 
 <style>
     .oneWidth {
-        width: 120px;
+        width: 140px;
     }
 
 </style>
@@ -46,6 +46,27 @@
         "Enable inclusion mode": {"en": "Enable inclusion mode", "de": "Enable Anlernen-Modus", "ru": "Включить режим присваивания адресов"},
         "Inclusion mode is active": {"en": "Inclusion mode is active", "de": "Anlernen-Modus ist aktiv", "ru": "Режим присваивания адресов активирован"},
         "Ok":                   {"en": "Ok",                "de": "Ok",                 "ru": "Ok"},
+        "Common": {
+            "de": "Allgemeine Einstellungen",
+            "en": "Common settings"
+        },
+        "Network settings": {
+            "de": "Netzwerk Einstellungen",
+            "en": "Network settings"
+        },
+        "Com port settings": {
+            "de": "Com Port Einstellungen",
+            "en": "Com port settings"
+        },
+        "Heartbeat interval": {
+            "de": "Intervall zum Senden eines Heartbeats",
+            "en": "intervall to send a heartbeat"
+        },
+        "do not use": {
+            "de": "nicht verwenden",
+            "en": "do not use"
+        }
+
     };
     var devices;
     var units;
@@ -85,23 +106,23 @@
             $('#getUnit').prop('disabled', false);
 
             var text = '<tr bgcolor="#808080"><td>' + _('id') +
-                    '</td><td>' + _('childId') +
-                    '</td><td>' + _('type') +
-                    '</td><td>' + _('ack') +
-                    '</td><td>' + _('subType') +
-                    '</td><td>' + _('payload') +
-                    '</td><td>' + _('Bind') +
-                    '</td></tr>';
+                '</td><td>' + _('childId') +
+                '</td><td>' + _('type') +
+                '</td><td>' + _('ack') +
+                '</td><td>' + _('subType') +
+                '</td><td>' + _('payload') +
+                '</td><td>' + _('Bind') +
+                '</td></tr>';
 
-             for (var j = 0; j < units.length; j++) {
+            for (var j = 0; j < units.length; j++) {
                 text += '<tr><td>'  + units[j].id +
-                        '</td><td>' + units[j].childId +
-                        '</td><td>' + (units[j].type  || '') +
-                        '</td><td>' + units[j].ack +
-                        '</td><td>' + (units[j].subType || '') +
-                        '</td><td>' + (units[j].payload || '') +
-                        '</td><td><button onclick=\'addUnit(' + JSON.stringify(units[j]) + ');\'>' + _('bind') + '</button>' +
-                        '</td></tr>';
+                    '</td><td>' + units[j].childId +
+                    '</td><td>' + (units[j].type  || '') +
+                    '</td><td>' + units[j].ack +
+                    '</td><td>' + (units[j].subType || '') +
+                    '</td><td>' + (units[j].payload || '') +
+                    '</td><td><button onclick=\'addUnit(' + JSON.stringify(units[j]) + ');\'>' + _('bind') + '</button>' +
+                    '</td></tr>';
             }
 
             $('#comTbl').html(text);
@@ -126,7 +147,8 @@
                 }, 1000);
                 return;
             }
-            var text = '<option value="">' + _('Select port') + '</option>';
+            //var text = '<option value="">' + _('Select port') + '</option>';
+            var text = '<option value="">' + _('do not use') + '</option>';
             for (var j = 0; j < list.length; j++) {
                 if (list[j].comName === 'Not available') {
                     text += '<option value="" selected>' + _('Not available') + '</option>';
@@ -232,7 +254,7 @@
         $('.udp').hide();
         $('.' + $('#type').val()).show();
     }
-    
+
     // ... and the function save has to exist.
     // you have to make sure the callback is called with the settings object as first param!
     function save(callback) {
@@ -261,44 +283,104 @@
     .help {
         font-size: small;
     }
+
+    td {
+        font-size: 13px;
+        padding-left:1px;
+        padding-right: 4px;
+        padding-top: 3px;
+        padding-bottom: 3px;
+    }
+    input {
+        font-size: 13px;
+    }
+    h1 {
+        font-size: 11px;
+        color: #505050;
+        font-weight: bold;
+        width: 100%;
+        padding-left:6px;
+        padding-right: 5px;
+        padding-top: 5px;
+        padding-bottom: 5px;
+        background-color: #e0e0e0;
+        /*background-image: linear-gradient(to right, #e0e0e0, rgba(224,224,224,0.0));*/
+        /*background-image: linear-gradient(to right, #e0e0e0, #e8e8e8 50%, #e0e0e0);*/
+    }
+
 </style>
 <!-- you have to put your config page in a div with id adapter-container<button id="addunit" onclick="test()">bind</button> -->
-    <div id="adapter-container">
-        <table><tr><td><img src="mysensors.png"></td><td><h3 class="translate">mySensors adapter settings</h3></td></tr></table>
-        <table>
-            <tr><td class="translate" style="width: 150px">Type:</td><td><select id="type" class="value oneWidth">
-                <option value="serial"  class="translate">serial</option>
-                <option value="tcp"     class="translate">tcp server</option>
-                <option value="udp"     class="translate">udp server</option>
-            </select></td><td></td></tr>
-            <tr class="serial"><td class="translate">Com port:</td><td><select class="value oneWidth" id="comName"></select></td><td></td></tr>
-            <tr class="serial"><td class="translate">Baud rate:</td><td><select class="value oneWidth" id="baudRate" input type="number" >
-                <option value="110">110</option>
-                <option value="150">150</option>
-                <option value="300">300</option>
-                <option value="600">600</option>
-                <option value="1200">1200</option>
-                <option value="2400">2400</option>
-                <option value="4800">4800</option>
-                <option value="9600">9600</option>
-                <option value="19200">19200</option>
-                <option value="38400">38400</option>
-                <option value="56000">56000</option>
-                <option value="57600">57600</option>
-                <option value="115200">115200</option>
-            </select></td><td></td></tr>
-            <tr class="tcp udp"><td class="translate">Bind:</td><td><select class="value" id="bind"></select></td><td></td></tr>
-            <tr class="tcp udp"><td class="translate">Port:</td><td><input type="number" class="value oneWidth" id="port" /></td><td></td></tr>
-            <tr class="udp serial"><td class="translate">Connection timeout:</td><td><input type="number" class="value oneWidth" id="connTimeout" /></td><td class="translate">ms</td></tr>
-            <tr class="tcp udp serial"><td class="translate">Inclusion mode timeout:</td><td><input type="number" class="value oneWidth" id="inclusionTimeout" /></td><td><span class="translate">ms</span></td></tr>
-            <tr class="tcp udp serial"><td></td><td colspan="2"><button id="enableInclusion" class="translateB">Enable inclusion mode</button></td></tr>
-        </table>
+<div id="adapter-container">
+    <table>
+        <td><img src="mysensors.png" height="48" width="48"  /></td>
+        <td style="padding-top: 20px;padding-left: 10px"><h3 class="translate">mySensors adapter settings</h3></td>
+    </table>
+
+    <h1 class="translate">Com port settings</h1>
+    <table>
+        <!--tr><td class="translate">Com port:</td><td><select class="value oneWidth" id="comName"></select></td><td></td></tr-->
+        <!--tr><td class="translate">Baud rate:</td><td><select class="value oneWidth" id="baudRate" input type="number" -->
+        <tr><td class="translate">Com port:</td><td><select class="value" id="comName"></select></td><td></td></tr>
+        <tr><td class="translate">Baud rate:</td><td><select class="value" id="baudRate" input type="number">
+            <option value="110">110</option>
+            <option value="150">150</option>
+            <option value="300">300</option>
+            <option value="600">600</option>
+            <option value="1200">1200</option>
+            <option value="2400">2400</option>
+            <option value="4800">4800</option>
+            <option value="9600">9600</option>
+            <option value="19200">19200</option>
+            <option value="38400">38400</option>
+            <option value="56000">56000</option>
+            <option value="57600">57600</option>
+            <option value="115200">115200</option>
+        </select></td></tr>
+        <!--tr><td class="translate">Heartbeat interval</td><td><input class="value oneWidth" type="input" id="comHeartbeatInterval"></input></td><td></td></tr-->
+    </table>
+    <h1 class="translate">Network settings</h1>
+    <table>
+        <tr><td class="translate" style="width: 150px">Type:</td><td><select id="type" class="value">
+            <!--option value="serial"  class="translate">serial</option-->
+            <option value="none"    class="translate">do not use</option>
+            <option value="tcp"     class="translate">tcp server</option>
+            <option value="udp"     class="translate">udp server</option>
+        </select></td><td></td></tr>
+        <!--tr class="serial"><td class="translate">Com port:</td><td><select class="value oneWidth" id="comName"></select></td><td></td></tr>
+        <tr class="serial"><td class="translate">Baud rate:</td><td><select class="value oneWidth" id="baudRate" input type="number" >
+            <option value="110">110</option>
+            <option value="150">150</option>
+            <option value="300">300</option>
+            <option value="600">600</option>
+            <option value="1200">1200</option>
+            <option value="2400">2400</option>
+            <option value="4800">4800</option>
+            <option value="9600">9600</option>
+            <option value="19200">19200</option>
+            <option value="38400">38400</option>
+            <option value="56000">56000</option>
+            <option value="57600">57600</option>
+            <option value="115200">115200</option>
+        </select></td><td></td></tr-->
+        <tr class="tcp udp"><td class="translate">Bind:</td><td><select class="value" id="bind"></select></td><td></td></tr>
+        <tr class="tcp udp"><td class="translate">Port:</td><td><input type="number" class="value oneWidth" id="port" /></td><td></td></tr>
+        <tr class="udp serial"><td class="translate">Connection timeout:</td><td><input type="number" class="value oneWidth" id="connTimeout" /></td><td class="translate">ms</td></tr>
+        <!--tr class="tcp udp"><td class="translate">Heartbeat interval</td><td><input class="value oneWidth" type="input" id="nwHeartbeatInterval"></input></td><td></td></tr-->
+
+        <!--tr class="tcp udp serial"><td class="translate">Inclusion mode timeout:</td><td><input type="number" class="value oneWidth" id="inclusionTimeout" /></td><td><span class="translate">ms</span></td></tr>
+        <tr class="tcp udp serial"><td></td><td colspan="2"><button id="enableInclusion" class="translateB">Enable inclusion mode</button></td></tr-->
+    </table>
+    <h1 class="translate">Common</h1>
+    <table>
+        <tr><td class="translate">Inclusion mode timeout:</td><td><input type="number" class="value oneWidth" id="inclusionTimeout" /></td><td><span class="translate">ms</span></td></tr>
+        <tr><td></td><td colspan="2"><button id="enableInclusion" class="translateB">Enable inclusion mode</button></td></tr>
+
+    </table>
 
 
-
-        <!--table class="tab1" id="comTbl" border="1" cellspacing="0"></table>
-    <div   id="pager-devices"></div>
-    <table id="devices"></table-->
-    </div>
+    <!--table class="tab1" id="comTbl" border="1" cellspacing="0"></table>
+<div   id="pager-devices"></div>
+<table id="devices"></table-->
+</div>
 
 </html>

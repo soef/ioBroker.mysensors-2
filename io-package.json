@@ -1,7 +1,7 @@
 {
   "common": {
     "name": "mysensors-2",
-    "version": "2.0.11",
+    "version": "2.0.20",
     "news": {
       "1.0.1": {
         "en": "necessary version of sensor module increased",
@@ -29,11 +29,11 @@
         "ru": "try/catch parse of messages"
       }
     },
-    "title": "mysensors-2 adapter",
+    "title": "mySensors-2",
     "desc": {
-      "en": "ioBroker mysensors-2 Adapter",
-      "de": "ioBroker Mysensors-2 Adapter",
-      "ru": "ioBroker Mysensors-2 драйвер "
+      "en": "ioBroker mySensors-2 Adapter",
+      "de": "ioBroker mySensors-2 Adapter",
+      "ru": "ioBroker mySensors-2 драйвер "
     },
     "platform":   "Javascript/Node.js",
     "mode":       "daemon",

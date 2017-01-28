@@ -2,12 +2,12 @@
 # ioBroker.mysensors-2
 =================
 
+[![NPM version](http://img.shields.io/npm/v/iobroker.mysensors-2.svg)](https://www.npmjs.com/package/iobroker.mysensors-2)
+[![Tests](http://img.shields.io/travis/soef/ioBroker.mysensors-2/master.svg)](https://travis-ci.org/soef/ioBroker.mysensors-2)
+[![License](https://img.shields.io/badge/license-MIT-blue.svg?style=flat)](https://github.com/soef/iobroker.mysensors-2/blob/master/LICENSE)
+
 This adapter communicates with [mysensors](http://www.mysensors.org) serial or ethernet gateway (TCP or UDP). 
 It ethernet gateway selected in this case ioBroker is server, that expects connections.
-
-## Version 2.0 Beta
-Please remove all previous instances of versions lower than 2.0.    
-The naming of devices, channels and states has changed. 
 
 ## Based on ioBroker.mysensors
 https://github.com/ioBroker/ioBroker.mysensors
