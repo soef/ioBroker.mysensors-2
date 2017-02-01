@@ -7,6 +7,7 @@ var _MySensors  = require(__dirname + '/lib/mysensors');
 var sensorEnums = require(__dirname + '/lib/mySensors-enums');
 var meta        = require(__dirname + '/lib/getmeta').meta;
 var sprintf     = require("sprintf-js").sprintf;
+var dns         = require('dns');
 
 var STATE_INCLUSION_ON    = 'commands.inclusionOn',
     STATE_INFO_CONNECTION = 'info.connection'
@@ -332,6 +333,46 @@ function createDefaultCommands(id, sensorId, ip) {
 //pendingCommands.add('2;0;3;0;19;0');
 
 
+function setRootDevicename(id, name, cb) {
+    if (!name) return cb && cb();
+    var newobj = {
+        //_id: id,
+        type: 'device',
+        common: {
+            name: name,
+            role: 'device'
+        }
+        // , native: { ip: ip }
+    };
+    //adapter.getObject(id, function(err, getobj) {
+        adapter.setObject (id, newobj, function (err, obj) {
+            if (!err && obj) {
+                newobj._id = obj.id;
+                //devices[obj.id]  = newobj;
+            }
+            cb && cb(err, obj);
+        });
+    //});
+}
+
+function setObjectHostName(ip, id, cb) {
+    var id = id.replace(/\..*$/, '');    // alles nach dem ersten . entfernen
+    if (!id) return cb && cb(-1);
+    var fullId = adapter.namespace + '.' + id;
+    if (devices[fullId] !== undefined) return cb && cb(0);
+    devices[fullId] = {};
+    if (ip === 'Serial') return setRootDevicename(fullId, ip, cb);
+    
+    dns.lookupService(ip, 0, function (err, hostname, service) {
+        if (err || !hostname) return cb && cb();
+        //hostname = hostname.split('.')[0];
+        hostname = hostname.replace(/\..*$/, '');
+        if (!hostname) return cb && cb();
+        setRootDevicename(fullId, hostname, cb);
+    });
+}
+
+
 function createNode(res, ip, port) {
     var objs = meta.getMetaInfo(res, ip, port, config[ip || 'serial']);
 
@@ -356,7 +397,9 @@ function createNode(res, ip, port) {
             }
         }
     }
-    doIt();
+    if (objs.length > 0) {
+        setObjectHostName(ip, objs[0]._id, doIt);
+    }
 }
 
 function logRawData(data) {
@@ -803,7 +846,7 @@ MySensors.prototype.onCreated = function (error) {
     
     if (error) {
         if (this.connectTries++ < 1 ) adapter.log.error('Failed to open ' + this.type + ' port: ' + error);
-        this.restartTimer = setTimeout(xrun, 5000, type);
+        this.restartTimer = setTimeout(xrun, 5000, this.type);
         return;
     }
     this.connectTries = 0;
@@ -817,6 +860,7 @@ function xrun (type) {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 
 function main() {
 
